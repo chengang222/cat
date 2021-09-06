@@ -202,17 +202,19 @@ public class AlertManager implements Initializable {
 		List<AlertChannel> channels = m_policyManager.queryChannels(type, group, level);
 
 		for (AlertChannel channel : channels) {
-			String title = "[告警恢复] [告警类型 " + alterType.getTitle() + "][" + group + " " + alert.getMetric() + "]";
-			String content = "[告警已恢复][恢复时间]" + currentMinute;
-			List<String> receivers = m_contactorManager.queryReceivers(alert.getContactGroup(), channel, type);
-			//去重
-			removeDuplicate(receivers);
+			if(!alterType.getTitle().equals("异常告警")&&!alterType.getTitle().equals("Transaction告警")){
+				String title = "[告警恢复] [告警类型 " + alterType.getTitle() + "][" + group + " " + alert.getMetric() + "]";
+				String content = "[告警已恢复][恢复时间]" + currentMinute;
+				List<String> receivers = m_contactorManager.queryReceivers(alert.getContactGroup(), channel, type);
+				//去重
+				removeDuplicate(receivers);
 
-			if (receivers.size() > 0) {
-				SendMessageEntity message = new SendMessageEntity(group, title, type, content, receivers);
+				if (receivers.size() > 0) {
+					SendMessageEntity message = new SendMessageEntity(group, title, type, content, receivers);
 
-				if (m_senderManager.sendAlert(channel, message)) {
-					return true;
+					if (m_senderManager.sendAlert(channel, message)) {
+						return true;
+					}
 				}
 			}
 		}
